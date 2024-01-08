@@ -40,12 +40,17 @@ const dbUrl = process.env.DB_URL;
 // Using connect-mongo for our session store. 
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+
 const store = MongoStore.create({
   mongoUrl: dbUrl,
+  secret,
   touchAfter: 24 * 60 * 60,
-  crypto: {
-      secret: 'squirrel'
-  }
+});
+ 
+store.on("error", function (e) {
+  console.log("SESSION STORE ERROR!!", e);
 });
 
 // cookies parser 
