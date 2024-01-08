@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "18.13.0"
+  },
   "name": "attractionratingsys",
   "version": "1.0.0",
   "description": "",
@@ -17,7 +20,7 @@
     "body-parser": "^1.20.2",
     "cloudinary": "^1.40.0",
     "connect-flash": "^0.1.1",
-    "connect-mongo": "^4.4.1",
+    "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",

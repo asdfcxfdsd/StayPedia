@@ -143,9 +143,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.get("/hello", (req, res) => {
-  console.log("Hello From Here")
-})
+
 
 
 // Wishlist Feature. 
