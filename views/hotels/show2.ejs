@@ -1,0 +1,168 @@
+<% layout('layouts/boilerplate') %>
+
+
+
+<div class="row">
+    <div class="col-6">
+
+        <div id="map" class="mb-2 rounded" style="width: auto; height: 300px;"></div>
+
+        <div class="card mb-3">
+            <!-- Carousel example -->
+            <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner">
+                    <% allPhotosFromApi.forEach((img,i) => { %>
+                        <div class="carousel-item <%= i===0 ? "active":"" %>">
+                            <img class="d-block w-100" src="<%=img %>" alt="">
+                        </div>
+                    <% }) %>
+                </div>
+                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </div>
+
+            <div class="card-body">
+                <h5 class="card-title"><%= hotelFromApi.name%></h5>
+                <% if(hotelFromApi.editorial_summary){ %>
+                    <p class="card-text"><%= hotelFromApi.editorial_summary.overview%></p>
+                <% }else{%>
+                    <p class="card-text">We don't have much information about that.</p>
+                <% }  %>
+            </div>
+
+            <ul class="list-group list-group-flush">
+                <% if (currentUser){ %>
+
+                    <% if (!currentUser.wishlist.includes(hotelFromApi._id)) { %>
+                    <li class="list-group-item">
+                        <form action="/hotels/<%=hotelFromApi._id %>/wishlist" method="post">
+                            <button type="submit" class="btn btn-success">
+                                Add to Wishlist
+                            </button>
+                        </form>
+                    </li>
+                    <% }else { %>
+                        <li class="list-group-item">
+                            <p>This hotel is already in your wishlist</p>
+                        </li>
+                    <% } %>
+
+                <% }%>
+
+
+                <li class="list-group-item text-muted"><%= hotelFromApi.formatted_address%></li>
+                <!-- <li class="list-group-item"><%= hotelFromApi.weekday_text %></li> -->
+                <li class="list-group-item"><%=hotelFromApi.formatted_phone_number  %></li>
+                <li class="list-group-item">
+                    ⭐ <%=hotelFromApi.rating %>
+                </li>
+            </ul> 
+
+            <div class="card-footer text-muted">
+                2 days ago
+            </div>
+        </div>
+        </div>
+    
+
+    
+    <div class="col-6">
+        <% if(currentUser) {%>
+            <h2>Leave a review</h2>
+            <form action="/hotels/<%=hotelFromApi._id %>/reviews" method="post" class="mb-3 validation-form" novalidate>
+                
+                <fieldset class="starability-grow
+                ">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="0" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                  </fieldset> 
+
+                  <div class="mb-3">
+                    <label class="form-label" for="body">Review</label>
+                    <textarea class="form-control" name="review[body]" id="body" cols="30" rows="10" required></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+            <% }  %>
+    
+    <!-- Review showcase section -->
+    <div class="mb-3">
+        <h1>Reviews on Google Maps</h1>
+
+        <% for (let review of hotelFromApi.reviews) {%>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        Rating: <%=review.rating %>
+                    </h5>
+                    <p class="card-title starability-result" data-rating="<%=review.rating %>">
+                        Rated: 3 stars
+                        </p>
+            
+                    <h6 class="card-subtitle mb-2 text-muted">Submitted By <%=review.author_name %></h6>
+                    <p class="cart-text">
+                        Review: <%=review.text %>
+                    </p>
+                      
+                </div>
+            </div>
+        
+        <% } %>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+<script>
+    const hotelFromApi = <%-JSON.stringify(hotelFromApi)%>; 
+</script>
+
+<!-- Mapbox setup -->
+<script>
+    
+    mapboxgl.accessToken = '<%-process.env.MAPBOX_TOKEN %>'; 
+
+    const lng = hotelFromApi.geometry.location.lng; 
+    const lat = hotelFromApi.geometry.location.lat; 
+    
+    const map = new mapboxgl.Map({
+    container: 'map', // container ID
+    style: 'mapbox://styles/mapbox/streets-v12', // style URL
+    center: [lng, lat], // starting position [lng, lat]
+    zoom: 9 // starting zoom
+});
+
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
+
+// Create a default Marker and add it to the map.
+const marker1 = new mapboxgl.Marker()
+.setLngLat([lng, lat])
+.addTo(map);
+
+</script>
+
