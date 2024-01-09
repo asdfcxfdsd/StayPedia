@@ -41,7 +41,8 @@ const dbUrl = process.env.DB_URL;
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
-const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
+const secret = 'thisshouldbeabettersecret!';
+
 
 const store = MongoStore.create({
   mongoUrl: dbUrl,
@@ -114,6 +115,7 @@ const { error } = require('console');
 const { name } = require('ejs');
 main().catch(err => console.log(err));
 async function main() {
+  mongoose.set("strictQuery", false);
   await mongoose.connect(dbUrl).then(() => {
     console.log("Database connected !!!")
   })
