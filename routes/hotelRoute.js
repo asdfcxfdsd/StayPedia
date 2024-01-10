@@ -178,7 +178,7 @@ router.get(
     searchHotelNearBy(location, radius, keyword)
       .then(async (hotelsDataFromNearByAPi) => {
         const hotelsWithPhotos = await fetchHotelPhotos(hotelsDataFromNearByAPi); 
-        console.log(hotelsWithPhotos)
+        // console.log(hotelsWithPhotos)
         res.render("hotels/index", {hotelsWithPhotos, hotelsFromMongo})
       })
       .catch((error) => {
@@ -249,7 +249,7 @@ router.get(
           // populate hotel.author.
           .populate("author");
 
-        console.log(hotelInDatabase);
+        // console.log(hotelInDatabase);
 
         res.render("hotels/show", { hotelInDatabase });
       } else {
@@ -285,7 +285,7 @@ getHotelPhoto()
     // Render page for hotel from Google Api.
     res.render("hotels/show2", { hotelFromApi, allPhotosFromApi });
     
-    console.log(allPhotosFromApi);
+    // console.log(allPhotosFromApi);
   })
   .catch((error) => {
     console.error("Error:", error);

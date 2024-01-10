@@ -1,5 +1,16 @@
 <!-- 專案基本資料 功能介紹、螢幕截圖或錄影 使用教學、專案啟動教學 涵蓋的技術 技術亮點或其他相關資訊 -->
 
+![Welcome page](https://img.onl/nICos1)
+![The Google Logo](https://img.onl/OpyjK2)
+![The Google Logo](https://img.onl/BmT3KN)
+![The Google Logo](https://img.onl/QA7yZZ
+)
+![The Google Logo](https://img.onl/knG6ZR)
+![The Google Logo](https://img.onl/ZvWtG
+)
+![The Google Logo](https://img.onl/VqUBsJ)
+### Deployment Link: https://staypedia.onrender.com
+
 
 # StayPedia 
 
@@ -55,6 +66,7 @@ npm start
 Provide instructions on how to use your website. Explain features, functionalities, and any setup required for users.
 
 ## Features 功能介紹
+
 - ✅ Use Passport technology to enable user registration, login, and logout.
 - ✅ Browse all hotel information and individual hotel details without requiring login.
 - ✅ Allow users to create new hotels and add reviews for hotels.
@@ -70,9 +82,6 @@ Provide instructions on how to use your website. Explain features, functionaliti
 
 
 
-
-
-
 ---
 
 ## Skills  
@@ -82,4 +91,7 @@ Provide instructions on how to use your website. Explain features, functionaliti
 
 ---
 ## 🩷 Feedback
-Feel free to tell me what you think if you have any suggestions or feedback. That'll be awesome. Thanks for reading. 
+
+I'd love to hear your thoughts and any feedback you might have. Your input is valuable to me, so feel free to share your suggestions. Thank you for taking the time to read through. Your feedback is greatly appreciated!  
+  
+Email: theadamhuang@gmail.com

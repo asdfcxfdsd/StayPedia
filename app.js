@@ -32,7 +32,7 @@ const axios = require("axios");
 
 const dbUrl = process.env.DB_URL 
 
-
+mongoose.set('strictQuery', true);
 mongoose.connect(dbUrl)
     .then(() => {
         console.log(" Mongo CONNECTEDD")
@@ -153,8 +153,6 @@ app.use("/", userRoutes);
 app.get('/', (req, res) => {
   res.render("home");
 });
-
-
 
 
 
