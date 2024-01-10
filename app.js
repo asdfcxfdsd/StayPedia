@@ -13,20 +13,15 @@ const app = express();
 const path = require("path"); 
 // Define the port number
 const port = 3000;
+const mongoose = require('mongoose');
 const methodOverride = require('method-override')
 const engine = require('ejs-mate');
-// import catchAsync to help us handle errors for async functions. 
 const catchAsync = require("./utils/catchAsync"); 
 const ExpressError = require("./utils/ExpressError"); 
-// JOI SCHEMA VALIDATION 
 const Joi = require("joi"); 
-// import  Hotel Model. 
 const Hotel = require("./models/hotel"); 
-// import Review Model. 
 const Review = require('./models/review'); 
-// Import schema for validation. 
 const {reviewSchema, hotelSchema} = require('./schema.js'); 
-
 // Passport.js for Signing in and out features. 
 const passport = require('passport'); 
 const LocalStrategy = require("passport-local"); 
@@ -35,21 +30,32 @@ const User = require("./models/user");
 const flash = require("connect-flash"); 
 const axios = require("axios"); 
 
-const dbUrl = process.env.DB_URL; 
+const dbUrl = process.env.DB_URL 
 
+
+mongoose.connect(dbUrl)
+    .then(() => {
+        console.log(" Mongo CONNECTEDD")
+    })
+    .catch((err) => {
+        console.log("OHH Mongo Error Connection")
+        console.log(err)
+
+    })
+
+
+// || 'mongodb://127.0.0.1:27017/hotel-rating-system'; 
 // Using connect-mongo for our session store. 
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const MongoDBStore = require('connect-mongo');
+const secret = "thisisabadsecret"
 
-const secret = 'thisshouldbeabettersecret!';
-
-
-const store = MongoStore.create({
+const store = MongoDBStore.create({
   mongoUrl: dbUrl,
   secret,
-  touchAfter: 24 * 60 * 60,
-});
- 
+  touchAfter: 24 * 60 * 60
+})
+
 store.on("error", function (e) {
   console.log("SESSION STORE ERROR!!", e);
 });
@@ -62,7 +68,7 @@ app.use(cookieParser());
 // const session = require('express-session');
 const sessionConfig = {
   store,
-  secret: 'thisshouldbeabettersecret!',
+  secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -87,12 +93,12 @@ app.use(flash());
 // So every view will access to res.locals we defined. 
 app.use((req, res, next) => {
   // req.user is stored in session. Thanks to Passport.js. 
+  console.log(req.user);
   res.locals.currentUser = req.user; 
   res.locals.success = req.flash('success'); 
   res.locals.error = req.flash('error'); 
   next(); 
 })
-
 
 
 
@@ -110,16 +116,15 @@ app.use(methodOverride('_method'));
 app.engine('ejs', engine); 
 
 // mongoose setup, getting-started.js
-const mongoose = require('mongoose');
-const { error } = require('console');
-const { name } = require('ejs');
-main().catch(err => console.log(err));
-async function main() {
-  mongoose.set("strictQuery", false);
-  await mongoose.connect(dbUrl).then(() => {
-    console.log("Database connected !!!")
-  })
-}
+// const { error } = require('console');
+// const { name } = require('ejs');
+// main().catch(err => console.log(err));
+// async function main() {
+//   mongoose.set("strictQuery", false);
+//   await mongoose.connect(dbUrl).then(() => {
+//     console.log("Database connected !!!")
+//   })
+// }
 
 // Configure view directory 
 app.set('views', path.join(__dirname, 'views'))// public directory
