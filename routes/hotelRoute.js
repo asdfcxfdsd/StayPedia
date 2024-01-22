@@ -23,8 +23,11 @@ const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
 // It is written on top of busboy for maximum efficiency.
 const multer = require("multer");
 const { storage, cloudinary } = require("../cloudinary/index");
+const path = require("path");
 // Store our images on Cloudinary.
 const upload = multer({ storage });
+
+
 
 // Use Joi to validate our hotel schema.
 const validateHotel = (req, res, next) => {
@@ -77,21 +80,8 @@ async function searchHotelNearBy(location, radius, keyword) {
   }
 }
 
-// async function getHotelFromApi(place_id) {
-//   const url = 'https://maps.googleapis.com/maps/api/place/details/json'
 
-//   const response = await axios.get(url, {
-//     params: {
-//       key: 'AIzaSyBZAdBZuh2bgL823ekoZsvoo7Nt7XuZXKY',
-//       place_id: place_id
-//     }
-//   })
-
-//   // console.log(response.data.result)
-// }
-
-// Get more detail information about one place with ID we got from place search api .
-
+// Get the details of specific hotel. 
 async function getPlaceDetail(place_id) {
   try {
     const url = "https://maps.googleapis.com/maps/api/place/details/json";
@@ -102,16 +92,6 @@ async function getPlaceDetail(place_id) {
       },
     });
 
-    // name
-    // description (editorial_summary.overview)
-    // location (formatted_address)
-    // Created by ..
-    // $25/night
-
-    // weekday_text
-    // formatted_address
-    // formatted_phone_number
-    // rating
     return response.data.result;
   } catch (e) {
     // if we can't get data from this place_id, then we return false.
@@ -121,105 +101,89 @@ async function getPlaceDetail(place_id) {
 }
 
 // Show all hotels
-router.get(
-  "/",
-  catchAsync(async (req, res) => {
+router.get("/",catchAsync(async (req, res) => {
     const hotelsFromMongo = await Hotel.find({});
-    const location = "47.608013, -122.335167";
-    const radius = 5000;
-    const keyword = "hotel";
-
-    async function fetchHotelPhotos(hotelsData) {
-    // Generate available image url from photo_reference of hotels we fetched from Google Nearby Search | Places API with Place Photos API. 
-
-    // Then, add those available image url to original hotel data.
-
-    // optimize the code to fetch hotel photos, consider making parallel requests to fetch photos concurrently, which can significantly improve performance when dealing with multiple photo fetches.
-
-    // One way to do this is by using Promise.all with axios.all to make multiple HTTP requests simultaneously.
-      const key = "AIzaSyBZAdBZuh2bgL823ekoZsvoo7Nt7XuZXKY";
-      const maxWidth = 400; 
-
-      try {
-        //把格式變成{個別hotel資料 , 這hotel的首個相片網址}
-        const requestPhotos = hotelsData.map(async(hotel) => {
-          
-            const photoRef = hotel.photos[0].photo_reference;
-            const url = `https://maps.googleapis.com/maps/api/place/photo?key=${key}&photoreference=${photoRef}&maxwidth=${maxWidth}`;
-
-            try {
-              const response = await axios.get(url); 
-              return {hotel, imageUrl: response.config.url}
-            }catch(error) {
-              console.error("Error fetching data:", error);
-              return {hotel, imageUrl: null}
-            }
-
-        })
-
-        const photos = await Promise.all(requestPhotos);
-              
-        // Put original array and imageUrl into new array.  
-        // {hotel, imageUrl: response.config.url}
-        photos.forEach((hotel, imageUrl) => {
-          hotel.hotelImageUrl = imageUrl
-        })
-        return photos; 
-
-      } catch(error) {
-        // empty array if we got 
-        res.render("error")
-        return []; 
-      }
-
-    }
-
-
-    searchHotelNearBy(location, radius, keyword)
-      .then(async (hotelsDataFromNearByAPi) => {
-        const hotelsWithPhotos = await fetchHotelPhotos(hotelsDataFromNearByAPi); 
-        // console.log(hotelsWithPhotos)
-        res.render("hotels/index", {hotelsWithPhotos, hotelsFromMongo})
-      })
-      .catch((error) => {
-        console.log("Error: ", error);
-        res.render("error")
-      })
-    
-    
-    // fetch hotel data from Google place Api.
-
-    // searchHotelNearBy(location, radius, keyboard)
-    //   .then(async(hotelsDataFromNearByApi) => {
-    //     // Generate available image url from photo_reference of hotels we fetched from Google Nearby Search | Places API with Place Photos API. 
-        
-    //     // Then, add those available image url to original hotel data. 
-    //     const hotelsWithPhotos = await fetchHotelPhotos(hotelsDataFromNearByApi); 
-    //     res.render("hotels/index", {hotelsWithPhotos});
-    //   })
-    //   .catch((error) => {
-    //     console.log("Error:", error);
-    //     res.render("error")
-    //   }) 
-
-    // for (let hotel of hotelsDataFromNearByApi) {
-    //   const key = "AIzaSyBZAdBZuh2bgL823ekoZsvoo7Nt7XuZXKY";
-    //   const maxWidth = 400; 
-    //   const photoRef = hotel.photos[0].photo_reference;
-    //   const url = `https://maps.googleapis.com/maps/api/place/photo?key=${key}&photoreference=${photoRef}&maxwidth=${maxWidth}`;
-  
-    //   try {
-    //     const response = await axios.get(url);
-    //     hotel.newImg = response.config.url;
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // }
-    
-
-    
+    const hotelsFromApi = [];
+    res.render("hotels/index", {hotelsFromMongo, hotelsFromApi});
   })
 );
+
+// search by text 
+router.post("/search", async(req, res) => {
+    const axios = require('axios');
+    const searchText = req.body.searchInput;    
+  
+    // get hotel data by google place text search api
+    async function getHotelsInCountry(country) {
+        try {
+            const apiKey = 'AIzaSyAnPyzEna3eyAK60vXKGjVNhQ-nXOUwBho';
+            const baseUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
+  
+            // Encode the country parameter to ensure it's URL-safe
+            const encodedCountry = encodeURIComponent(`hotels in ${country}`);
+  
+            const apiUrl = `${baseUrl}?query=${encodedCountry}&key=${apiKey}`;
+  
+            // Make a GET request to the Places API
+            const response = await axios.get(apiUrl);
+  
+            // Handle the response
+            if (response.data.status === 'OK') {
+                // Process the list of hotels
+                const hotelsByCountry = response.data.results;
+                
+                // Fetch photos for each hotel and add them to hotelsByCountry
+                const hotelsFromApi = await Promise.all(hotelsByCountry.map(fetchHotelPhotos));
+                
+                // Render the page with hotelsByCountry and searchText
+                return res.render("hotels/index", { hotelsFromApi, searchText });
+            } else {
+                // Flash error and refresh the page if no hotels found.
+                console.error('Error fetching hotel data:', response.data.status);
+                res.flash("error", "No hotels found")
+                res.redirect('/hotels')
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    }
+  
+    // Function to fetch photos for a hotel
+    async function fetchHotelPhotos(hotel) {
+        try {
+            const apiKey = 'AIzaSyAnPyzEna3eyAK60vXKGjVNhQ-nXOUwBho';
+            const baseUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
+  
+            const apiUrl = `${baseUrl}?place_id=${hotel.place_id}&fields=photos&key=${apiKey}`;
+  
+            // Make a GET request to the Places API
+            const response = await axios.get(apiUrl);
+  
+            // Handle the response
+            if (response.data.status === 'OK' && response.data.result.photos) {
+                const photoReferences = response.data.result.photos.map(photo => {
+                    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${apiKey}`;
+                });
+  
+                hotel.photoUrls = photoReferences;
+            } else {
+                // If no photos found, assign an empty array
+                hotel.photoUrls = [];
+            }
+        } catch (error) {
+            console.error('Error fetching hotel photos:', error.message);
+            // If an error occurs, assign an empty array
+            hotel.photoUrls = [];
+        }
+  
+        return hotel;
+    }
+  
+    // Call the asynchronous function
+    getHotelsInCountry(searchText);
+  });
+
+
 
 // Render new hotel form.
 router.get("/new", isLoggedIn, (req, res) => {
@@ -233,8 +197,7 @@ router.get(
   catchAsync(async (req, res) => {
     const { id } = req.params;
     const hotelFromApi = await getPlaceDetail(id);
-    let allPhotosFromApi = [];
-
+    console.log(hotelFromApi)
     try {
       if (!hotelFromApi) {
         const hotelInDatabase = await Hotel.findById(id)
@@ -249,8 +212,7 @@ router.get(
           // populate hotel.author.
           .populate("author");
 
-        // console.log(hotelInDatabase);
-
+        console.log(hotelInDatabase);
         res.render("hotels/show", { hotelInDatabase });
       } else {
        // Get all photos of the hotel.
@@ -302,6 +264,7 @@ getHotelPhoto()
 );
 
 // Create a new hotel
+
 router.post(
   "/",
   isLoggedIn,
@@ -327,12 +290,12 @@ router.post(
       path: f.path,
       filename: f.filename,
     }));
+  
 
     // We'll save current user to hotel.author filed when we create a new hotel.
     hotel.author = req.user._id;
     await hotel.save();
 
-    console.log(hotel);
     // Define the flash message if we create a new hotel.
     req.flash("success", "Successfully made a new hotel !!!");
     res.redirect(`/hotels/${hotel._id}`);
@@ -370,27 +333,26 @@ router.put(
 
     const hotel = await Hotel.findByIdAndUpdate(id, { ...req.body.hotel });
 
-    // Update Images.
-
+    // ADD MORE PHOTOS 
+    
     // Turn req.files into the format we want.
     const imgs = req.files.map((f) => ({
       path: f.path,
       filename: f.filename,
     }));
-
-    // Push new images to existing image array
+    // Push new photos to existing image array
     hotel.images.push(...imgs);
+    
 
-    // Delete images
+    // Delete images backend
     if (req.body.deleteImages) {
-      // delete imgs from cloudinary
+      // Delete images from Cloudinary 
       for (let filename of req.body.deleteImages) {
         await cloudinary.uploader.destroy(filename);
       }
       await hotel.updateOne({
         $pull: { images: { filename: { $in: req.body.deleteImages } } },
       });
-      console.log(req.body);
     }
 
     await hotel.save();
@@ -417,22 +379,6 @@ router.delete(
   })
 );
 
-// Add a hotel to user's wishlist.
-router.post(
-  "/:id/wishlist",
-  catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const hotel = await Hotel.findById(id);
-    const user = await User.findById(req.user);
-    user.wishlist.push(hotel);
-    await hotel.save();
-    await user.save();
 
-    req.flash("success", "Add the hotel to your wishlist.");
-    res.redirect(`/hotels/${hotel._id}`);
-
-    console.log(user);
-  })
-);
 
 module.exports = router;

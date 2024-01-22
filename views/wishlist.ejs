@@ -60,31 +60,32 @@
 <body>
 
 
-<div class="container mt-5 wishlist-container">
-  <div class="row">
-    <% for(let hotel of user.wishlist) { %>
-        <div class="col-md-4"> 
-            <div class="wishlist-item"> 
-              <h4><%=hotel.title  %></h4>
-              <img src="<%=hotel.image  %>" alt="">
-              <p>Location: <%=hotel.location %></p>
-              <p class="rating">Rating: 4.5</p>
-              <a class="btn btn-primary" href="/hotels/<%=hotel._id %>">View property</a>
-            
-              <!-- Delete hotel in wishlist.  -->
-              <form action="/wishlist/<%=hotel._id  %>?_method=DELETE" method="post">
-                <button class="btn btn-danger float-right">Remove</button>
-              </form>
-              
 
 
-            </div>
-          </div>
-    <% } %>
-
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  <% for (let hotel of user.wishlist) { %>
     
-    
-  </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="<%=hotel.images[0].path  %>" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title"><%=hotel.title %></h5>
+          <p class="card-text"><%=hotel.description %></p>
+        
+       
+          
+          <div class="card-body">
+            <a class="card-link btn btn-info" href="/hotels/<%=hotel._id  %>">More details</a>
+            <form class="d-inline" action="/wishlist/<%=hotel._id  %>?_method=DELETE" method="POST">
+                <button class="btn btn-danger">Remove</button>
+            </form>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  
+  <% } %>
 </div>
 
 <!-- Link to Bootstrap JS (optional) -->

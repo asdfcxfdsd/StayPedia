@@ -34,8 +34,8 @@ const isReviewAuthor = async(req, res, next) => {
 }
 
 
-// Create a new review 
-router.post("/", isLoggedIn , validateReview ,catchAsync(async(req, res) => {
+// create a new review for hotel from mongoDB. 
+router.post("/mongoDB_hotel", isLoggedIn , validateReview ,catchAsync(async(req, res) => {
     const {id} = req.params; 
     const hotel = await Hotel.findById(id); 
     // req.body.review is where we put into 
@@ -44,7 +44,6 @@ router.post("/", isLoggedIn , validateReview ,catchAsync(async(req, res) => {
     // Store the user who created the review to review.author . 
     review.author = req.user._id; 
     
-
 
     // Push review we got to the review section of specific hotel. 
     hotel.reviews.push(review); 
@@ -59,6 +58,11 @@ router.post("/", isLoggedIn , validateReview ,catchAsync(async(req, res) => {
     
   }))
   
+
+
+
+
+
   // Deleting Reviews 
   // why don't we save after deleting review. 
   //When you delete an object, that action is permanent, and the object is no longer found in the database, so if you try to save that same object that was just deleted, an error will indeed be thrown. You don't need to save findByIdAndDelete() operations.

@@ -11,9 +11,10 @@ if (process.env.NODE_ENV !== "production") {
 const express = require('express');
 const app = express();
 const path = require("path"); 
-// Define the port number
+const fetch = require('node-fetch');
 const port = 3000;
 const mongoose = require('mongoose');
+const mongo = require('mongodb')
 const methodOverride = require('method-override')
 const engine = require('ejs-mate');
 const catchAsync = require("./utils/catchAsync"); 
@@ -30,7 +31,8 @@ const User = require("./models/user");
 const flash = require("connect-flash"); 
 const axios = require("axios"); 
 
-const dbUrl = process.env.DB_URL 
+// const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/hotel-rating-system'; 
+const dbUrl = 'mongodb://localhost:27017/hotel-rating-system'; 
 
 mongoose.set('strictQuery', true);
 mongoose.connect(dbUrl)
@@ -40,7 +42,6 @@ mongoose.connect(dbUrl)
     .catch((err) => {
         console.log("OHH Mongo Error Connection")
         console.log(err)
-
     })
 
 
@@ -93,7 +94,7 @@ app.use(flash());
 // So every view will access to res.locals we defined. 
 app.use((req, res, next) => {
   // req.user is stored in session. Thanks to Passport.js. 
-  console.log(req.user);
+  // console.log(req.user);
   res.locals.currentUser = req.user; 
   res.locals.success = req.flash('success'); 
   res.locals.error = req.flash('error'); 
@@ -115,17 +116,6 @@ app.use(methodOverride('_method'));
 // use ejs-locals for all ejs templates
 app.engine('ejs', engine); 
 
-// mongoose setup, getting-started.js
-// const { error } = require('console');
-// const { name } = require('ejs');
-// main().catch(err => console.log(err));
-// async function main() {
-//   mongoose.set("strictQuery", false);
-//   await mongoose.connect(dbUrl).then(() => {
-//     console.log("Database connected !!!")
-//   })
-// }
-
 // Configure view directory 
 app.set('views', path.join(__dirname, 'views'))// public directory
 app.set('view engine', 'ejs');
@@ -134,20 +124,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 console.log(path.join(__dirname, 'views'));
 
 
-
-
-
 // USE ROUTER 
 // /hotels/* will be sent to our hotelRouter.
 
 // All Routes of Hotels. 
 app.use("/hotels", hotelRoutes);
 // All Routes of Review. 
-app.use("/hotels/:id/reviews", reviewRoutes); 
+app.use("/hotels/:id/reviews", reviewRoutes);  
 // All Routes of User. 
 app.use("/", userRoutes); 
-
-
 
 
 app.get('/', (req, res) => {
@@ -159,13 +144,73 @@ app.get('/', (req, res) => {
 // Wishlist Feature. 
 app.get("/wishlist", async(req, res) => {
   const {id} = req.params; 
+  // If someone is logged in , we showed the wishlist page. 
   if (req.user) {
     const user = await User.findById(req.user._id).populate('wishlist'); 
     console.log(user); 
     // res.redirect('/hotels', {user}); 
     res.render('wishlist', {user});
+  } else {
+    req.flash("error", "Please login first")
+    res.redirect("/login")
   }
 })
+
+
+// Get the details of specific hotel. 
+async function getPlaceDetail(place_id) {
+  try {
+    const url = "https://maps.googleapis.com/maps/api/place/details/json";
+    const response = await axios.get(url, {
+      params: {
+        place_id: place_id,
+        key: "AIzaSyBZAdBZuh2bgL823ekoZsvoo7Nt7XuZXKY",
+      },
+    });
+
+    return response.data.result;
+  } catch (e) {
+    // if we can't get data from this place_id, then we return false.
+    return false;
+    console(e);
+  }
+}
+
+
+// Add a hotel to user's wishlist.
+app.post(
+  "/hotels/:id/wishlist",
+  catchAsync(async (req, res, next) => {
+    const { id } = req.params;
+    
+    const user = await User.findById(req.user);
+    const hotelFromApi = await getPlaceDetail(id); 
+
+    if (hotelFromApi) {
+      // if the hotel we want to add into wishlists is from API .
+      //  res.send("DONE")
+      // console.log(hotelFromApi)
+     
+      // convert place_id into ObjectID
+      var newID = new mongo.ObjectID(hotelFromApi.place_id);
+
+      user.wishlist.push(newID);
+      await user.save()
+      req.flash("success", "You add this hotel to your wishlist.");
+      res.redirect(`/hotels/${hotelFromApi.place_id}`);
+    } else {
+      // if the hotel we want to add into wishlists is from MongoDB. 
+      const hotelFromMongoDB = await Hotel.findById(id);
+      user.wishlist.push(hotelFromMongoDB);
+      await hotelFromMongoDB.save();
+      await user.save()
+      req.flash("success", "You add this hotel to your wishlist.");
+      res.redirect(`/hotels/${hotelFromMongoDB._id}`);
+    }
+
+  })
+);
+
 // Delete Item in Wishlist.
 app.delete('/wishlist/:hotelId', async(req, res, next) => {
   try {
@@ -186,27 +231,20 @@ app.delete('/wishlist/:hotelId', async(req, res, next) => {
   res.redirect('/wishlist'); 
 
   } catch (e) {
-    console.log(e); 
-
+    req.flash('error', 'Error occurred !!!')
+    res.redirect('/hotels')
   }
 })
 
 
 
 
-// The purpose of this middleware function is to handle any requests that do not match any existing route. 
 
-// In this case, it will create a new ExpressError object with the message "Page Not Found!!!" and a status code of 404 (Not Found). This error will then be passed to the next middleware function in the chain, 
-// which will typically be the error handling middleware provided by the Express framework.
-// This code is used to provide a generic error message and status code for any requests that do not match any existing routes in the application.
 app.all('*', (res, req, next) => {
   next(new ExpressError("Page Not Found !!!", 404))
 })
 
 
-
-// The app.use method is used as a middleware, when we want certain actions to be potentially handled in all routes, or before any routes, for example. 
-// Overall, this middleware function is used to handle errors that occur during the processing of a request and provide a meaningful response to the client.
 app.use((err, req, res, next) => {
   const {statusCode=500, message = "Something Went Wrong !!!"} = err; 
 
