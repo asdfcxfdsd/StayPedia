@@ -1,4 +1,7 @@
 {
+  "engine": {
+    "node": "18.13.0"
+  }, 
   "name": "staypedia",
   "version": "1.0.0",
   "description": "",

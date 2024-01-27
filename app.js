@@ -177,6 +177,7 @@ async function getPlaceDetail(place_id) {
 }
 
 
+
 // Add a hotel to user's wishlist.
 app.post(
   "/hotels/:id/wishlist",
