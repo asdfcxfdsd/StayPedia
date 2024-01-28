@@ -1,18 +1,7 @@
-<!-- 專案基本資料 功能介紹、螢幕截圖或錄影 使用教學、專案啟動教學 涵蓋的技術 技術亮點或其他相關資訊 -->
-
-
-![The Google Logo](https://img.onl/QZIM0z)
-![The Google Logo](https://img.onl/BmT3KN)
-![The Google Logo](https://img.onl/QA7yZZ
-)
-![The Google Logo](https://img.onl/knG6ZR)
-![The Google Logo](https://img.onl/ZvWtG
-)
-![The Google Logo](https://img.onl/VqUBsJ)
-### Deployment Link: https://staypedia.onrender.com
-
-
 # StayPedia 
+### Click here to see the project in real-time: https://staypedia.onrender.com
+### Introduction video to showcase this project :  
+https://www.loom.com/share/0b0b62fd2ef646e9a5f71d4079e6f176?sid=2915e714-f7b7-452e-982b-81585fcb2ac0
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -24,46 +13,23 @@ Hotel Review System: Share restaurant details, allow reviews and bookmarking, an
 ## Table of Contents
 
 - [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+- [Features](#Features)
+- [Technologies](#Technologies)
+- [Feedback](#Feedback)
 
 ---
 
 ## Installation 
-To set up this project locally, follow these steps:
-1. **Clone the Repository:**
-   ```bash
-   git clone <repository_url>
-2. Navigate to the Project Directory:
+To set up this project locally, please follow these steps:
 ```
-cd <project_directory>
-
+$ cd <project_url>
+$ npm install
+$ npm start
 ```
-* Replace <project_directory> with the name of your project directory.
 
-
-3. Install Dependencies:
-```
-npm install
-
-```
-* This command will install all the necessary dependencies for the project.
-
-
-4. Start the Application:
-
-``` 
-npm start
-```
 * This command will start the project. You can view it in your browser at http://localhost:3000.
 
 ---
-
-## Usage 
-
-Provide instructions on how to use your website. Explain features, functionalities, and any setup required for users.
 
 ## Features 功能介紹
 
@@ -84,7 +50,7 @@ Provide instructions on how to use your website. Explain features, functionaliti
 
 ---
 
-## Skills  
+## Technologies  
 
 - ✅Frontend:  HTML, CSS, Axios, AJAX, Bootstrap 5, EJS
 - ✅Backend: Node.js, Express, MongoDB, RESTful API, Passport Authentication, Heroku, Cloudinary, Mapbox. 
