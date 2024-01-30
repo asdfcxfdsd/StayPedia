@@ -1,6 +1,6 @@
 # StayPedia 
 ### Click here to see the project in real-time: https://staypedia-7t4n.onrender.com/  (It might be a little bit slow the first time you enter the website becasue of the free version of Render.)
-### Introduction video to showcase this project : https://www.loom.com/share/0b0b62fd2ef646e9a5f71d4079e6f176?sid=2915e714-f7b7-452e-982b-81585fcb2ac0
+### Introduction video to showcase this project : https://www.loom.com/share/e5122e50f9e240a4973b72037af339ad?sid=f509cfd9-f205-4a99-a67b-798dc71cb52e
 
 
 
