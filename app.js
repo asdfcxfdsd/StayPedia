@@ -184,6 +184,8 @@ app.post(
   catchAsync(async (req, res, next) => {
     const { id } = req.params;
     
+
+    
     const user = await User.findById(req.user);
     const hotelFromApi = await getPlaceDetail(id); 
 
