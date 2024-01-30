@@ -1,9 +1,8 @@
 # StayPedia 
-### Click here to see the project in real-time: https://staypedia.onrender.com
-### Introduction video to showcase this project :  
-https://www.loom.com/share/0b0b62fd2ef646e9a5f71d4079e6f176?sid=2915e714-f7b7-452e-982b-81585fcb2ac0
+### Click here to see the project in real-time: https://staypedia-7t4n.onrender.com/
+### Introduction video to showcase this project : https://www.loom.com/share/0b0b62fd2ef646e9a5f71d4079e6f176?sid=2915e714-f7b7-452e-982b-81585fcb2ac0
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 
 ## Description
 Hotel Review System: Share restaurant details, allow reviews and bookmarking, and integrate with Google Place API for presentation, enabling nomads and travel enthusiasts to discover hotels for the ultimate experience.
