@@ -32,19 +32,13 @@ $ npm start
 
 ## Features 功能介紹
 
-- ✅ Use Passport technology to enable user registration, login, and logout.
-- ✅ Browse all hotel information and individual hotel details without requiring login.
-- ✅ Allow users to create new hotels and add reviews for hotels.
-- ✅ Begin from the landing page as the entry point to the homepage.
-- ✅ Display a map and location for all hotels on the homepage.
-- ✅ Show the hotel map on each individual hotel page.
-- ✅ Allow users to delete or edit hotels they've created.
-- ✅ Enable users to delete their reviews for hotels.
-- ✅ Display Google Maps reviews on the respective hotel page.
-- ✅ Allow users to add a hotel to their favorites.
-- ✅ Deploy to Heroku (due to non-free services later on, redeploy on Docker).
-
-
+- ✅ Implemented Passport authentication for user registration, login, and logout.
+- ✅ Developed an intuitive interface for browsing hotel information and reviews.
+- ✅ Enabled users to create, edit, and delete hotels and reviews.
+- ✅ Integrated interactive maps displaying hotel locations.
+- ✅ Displayed Google Maps reviews on hotel pages.
+- ✅ Implemented favorite hotel functionality.
+- ✅ Successfully deployed to Heroku and later migrated to Render.
 
 
 ---
